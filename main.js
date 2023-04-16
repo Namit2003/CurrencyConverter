@@ -3,7 +3,7 @@
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    document.querySelector("#currency-converter").addEventListener("submit", (event) => {
+    document.querySelector("#currency-converter").addEventListener("submit", async (event) => {
         event.preventDefault();
         const { target: { from, to, amount } } = event;
 
@@ -15,13 +15,26 @@ document.addEventListener("DOMContentLoaded", () => {
             headers,
         }
 
-        fetch(`https://api.apilayer.com/exchangerates_data/convert?to=${to.value}&from=${from.value}&amount=${amount.valueAsNumber}`, requestOptions)
-            .then(response => response.json())
-            .then(data => {
-                let { date, query: { from, to, amount }, result } = data;
-                document.querySelector(".result").textContent = `On ${date}, ${amount} ${from} is worth ${result.toFixed(2)} ${to}.`;
-            })
-            .catch(error => console.log(error));
+        // METHOD 1
+
+        // fetch(`https://api.apilayer.com/exchangerates_data/convert?to=${to.value}&from=${from.value}&amount=${amount.valueAsNumber}`, requestOptions)
+        //     .then(response => response.json())
+        //     .then(data => {
+        //         let { date, query: { from, to, amount }, result } = data;
+        //         document.querySelector(".result").textContent = `On ${date}, ${amount} ${from} is worth ${result.toFixed(2)} ${to}.`;
+        //     })
+        //     .catch(error => console.log(error));
+
+        // METHOD 2 (async & await)
+
+        try {
+            let response = await fetch(`https://api.apilayer.com/exchangerates_data/convert?to=${to.value}&from=${from.value}&amount=${amount.valueAsNumber}`, requestOptions);
+            const data = await response.json();
+            let { date, query: { from: newForm, to: newTo, amount: newAmount }, result } = data;
+            document.querySelector(".result").textContent = `On ${date}, ${newAmount} ${newForm} is worth ${result.toFixed(2)} ${newTo}.`;
+        } catch (error) {
+            console.log(error);
+        }
     })
 
 })
